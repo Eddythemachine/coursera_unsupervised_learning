@@ -45,6 +45,36 @@ This repository documents my progress on the IBM Coursera Unsupervised Learning 
 
 ---
 
+## 🚀 Independent Project: Customer Personality Analysis
+
+After mastering the concepts in the course, I applied K-Means clustering to a real-world marketing dataset to perform **Customer Segmentation**.
+
+### 1. The Challenge
+The goal was to transform raw customer data (demographics, purchase history, web activity) into actionable segments to help the marketing team move away from "one-size-fits-all" campaigns.
+
+### 2. The Process & Technical Challenges
+* **Data Cleaning & Outlier Removal:**
+    * Identified skewed columns (e.g., `Income`, `WebVisits`).
+    * Removed extreme outliers ("Whales") that were distorting the cluster centers.
+* **Advanced Preprocessing Pipeline:**
+    * Built a Scikit-Learn `ColumnTransformer` to handle mixed data types.
+    * **Crucial Step:** Standard Scaling was not enough. I used **PowerTransformer (Yeo-Johnson)** to fix the skewness in continuous variables, which reduced Inertia from billions to manageable numbers.
+    * Used `OneHotEncoder` for categorical variables (Education, Marital Status).
+* **Model Selection:**
+    * Used the **Elbow Method** to narrow down $k$ to 3 or 4.
+    * Used **Silhouette Scores** to validate. While $k=2$ had the highest score mathematically, I chose **$k=3$** because it provided better business granularity.
+
+### 3. Key Insights (The Personas)
+Using the cluster centers, I derived three distinct customer profiles:
+
+| Cluster | Persona Name | Key Characteristics | Strategy |
+| :--- | :--- | :--- | :--- |
+| **0** | **The Budget Browsers** | Low Income, Parents with **Toddlers**. High web visits but low spending. | Cost control; Low-cost activation coupons. |
+| **1** | **The VIPs** | High Income, **No Kids/Empty Nesters**. Massive spending on Wine & Meat. | Focus on retention; Exclusive catalog offers. |
+| **2** | **The Deal Hunters** | Middle Income, Parents with **Teenagers**. High web & discount purchases. | Email retargeting; Bundle offers and sales. |
+
+---
+
 ## 🛠️ Installation & Setup
 
 This project uses **Python** and **VS Code**.
