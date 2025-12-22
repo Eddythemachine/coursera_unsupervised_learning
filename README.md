@@ -24,6 +24,12 @@ This repository documents my progress on the IBM Coursera Unsupervised Learning 
 - **The Elbow Method:** A technique to scientifically choose the best number of clusters ($k$) by plotting Inertia and finding the inflection point.
 - **Silhouette Coefficient:** An alternative metric useful when the "Elbow" is not clearly defined.
 
+### 5. Distance Metrics & The Curse of Dimensionality
+- **Importance of Distance:** Clustering results depend heavily on how "distance" is defined (Euclidean vs. Manhattan vs. Cosine).
+- **The Curse of Dimensionality:** As dimensions (features) increase, the volume of the space increases exponentially, making data "sparse".
+  - **Loss of Contrast:** In high dimensions, the distance between the nearest and farthest points becomes negligible—everything looks "equally far away."
+  - **Impact:** Traditional distance metrics (like Euclidean) lose meaning, and model performance often degrades due to overfitting.
+
 ---
 
 ## 🔬 Labs & Practical Exercises
@@ -42,6 +48,17 @@ This repository documents my progress on the IBM Coursera Unsupervised Learning 
   2. Applied K-Means to find the "dominant colors" (clusters).
   3. Replaced every pixel with its nearest cluster center color.
 - **Result:** Successfully compressed an image from millions of potential colors down to just $k$ colors (e.g., $k=8$) while retaining the image structure.
+
+### Lab 2: Investigating the Curse of Dimensionality
+**Objective:** Visualize and quantify how high-dimensional space impacts data density and model performance.
+
+#### A. Geometric Intuition (The N-Sphere)
+- **The Experiment:** We calculated the volume ratio of a hypersphere inside a hypercube as dimensions increased.
+- **The Finding:** As dimensions ($d$) rise, the volume of the sphere vanishes (e.g., from ~78% in 2D to ~0% in high dimensions). This proves that in high-dimensional space, **most data points live in the "corners"** (far from the center).
+
+#### B. Impact on Model Performance
+- **Simulation:** Trained a `DecisionTreeClassifier` on synthetic data while increasing the number of features (from 2 to 4000).
+- **Result:** Accuracy dropped significantly as dimensions increased. This demonstrated that adding features—without proper selection or reduction—can lead to noise and overfitting, confirming the need for techniques like **PCA** (Principal Component Analysis).
 
 ---
 
