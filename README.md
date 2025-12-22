@@ -25,10 +25,19 @@ This repository documents my progress on the IBM Coursera Unsupervised Learning 
 - **Silhouette Coefficient:** An alternative metric useful when the "Elbow" is not clearly defined.
 
 ### 5. Distance Metrics & The Curse of Dimensionality
-- **Importance of Distance:** Clustering results depend heavily on how "distance" is defined (Euclidean vs. Manhattan vs. Cosine).
+- **Importance of Distance:** Clustering results depend heavily on how "distance" is defined.
 - **The Curse of Dimensionality:** As dimensions (features) increase, the volume of the space increases exponentially, making data "sparse".
   - **Loss of Contrast:** In high dimensions, the distance between the nearest and farthest points becomes negligible—everything looks "equally far away."
   - **Impact:** Traditional distance metrics (like Euclidean) lose meaning, and model performance often degrades due to overfitting.
+
+### 6. Advanced Distance Metrics
+Understanding that "distance" is subjective to the problem context:
+- **Euclidean ($L2$ Norm):** The straight-line physical distance. Best for low-dimensional, continuous numerical data. 
+- **Manhattan ($L1$ Norm):** The sum of absolute differences (grid-like movement). Often robust in higher dimensions compared to Euclidean.
+- **Cosine Distance:** Measures the cosine of the angle between two vectors.
+  - **Use Case:** Critical in text analysis (NLP) where the *direction* (context) matters more than the *magnitude* (frequency). 
+- **Jaccard Distance:** Measures dissimilarity between sets ($1 - \text{Intersection over Union}$).
+  - **Use Case:** Ideal for categorical data or comparing binary sets (e.g., "Does Set A have the same fruit as Set B?").
 
 ---
 
@@ -59,6 +68,18 @@ This repository documents my progress on the IBM Coursera Unsupervised Learning 
 #### B. Impact on Model Performance
 - **Simulation:** Trained a `DecisionTreeClassifier` on synthetic data while increasing the number of features (from 2 to 4000).
 - **Result:** Accuracy dropped significantly as dimensions increased. This demonstrated that adding features—without proper selection or reduction—can lead to noise and overfitting, confirming the need for techniques like **PCA** (Principal Component Analysis).
+
+### Lab 3: Distance Metrics Analysis
+**Objective:** Analyze how choosing the wrong distance metric can alter algorithm performance and cluster shapes.
+
+#### A. Mathematical Implementations
+- Implemented and compared **Euclidean**, **Manhattan**, **Cosine**, and **Jaccard** distances using `scipy.spatial` and `sklearn.metrics`.
+- **Key finding:** For categorical data (like the Breast Cancer dataset), we converted features using `OneHotEncoder` to apply **Jaccard Scoring**, proving that numerical distance (Euclidean) is invalid for non-numeric categories.
+
+#### B. Impact on DBSCAN
+- We ran the **DBSCAN** algorithm on synthetic data using different `metric` parameters. 
+- **Euclidean/Manhattan:** Produced standard spherical or blocky clusters.
+- **Cosine:** Created cone-shaped clusters radiating from the origin, grouping points by *angle* rather than position. This demonstrated that algorithms behave fundamentally differently depending on the mathematical "ruler" used.
 
 ---
 
