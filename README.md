@@ -24,20 +24,20 @@ This repository documents my progress on the IBM Coursera Unsupervised Learning 
 - **The Elbow Method:** A technique to scientifically choose the best number of clusters ($k$) by plotting Inertia and finding the inflection point.
 - **Silhouette Coefficient:** An alternative metric useful when the "Elbow" is not clearly defined.
 
-### 5. Distance Metrics & The Curse of Dimensionality
-- **Importance of Distance:** Clustering results depend heavily on how "distance" is defined.
-- **The Curse of Dimensionality:** As dimensions (features) increase, the volume of the space increases exponentially, making data "sparse".
-  - **Loss of Contrast:** In high dimensions, the distance between the nearest and farthest points becomes negligible—everything looks "equally far away."
-  - **Impact:** Traditional distance metrics (like Euclidean) lose meaning, and model performance often degrades due to overfitting.
+### 5. Advanced Clustering Algorithms
+Beyond K-Means, we explored algorithms that handle non-spherical data and do not require pre-defining $k$:
+- **Hierarchical Clustering (Agglomerative):** Builds a hierarchy of clusters from the bottom up. Visualized using **Dendrograms** to determine the optimal cut-off point.
+- **DBSCAN (Density-Based Spatial Clustering):** Groups points that are closely packed together (high density).
+  - **Key Parameters:** $\epsilon$ (Epsilon - radius) and `min_samples`.
+  - **Advantage:** Can find arbitrary shapes and explicitly identifies **Noise/Outliers** (points that don't belong to any cluster).
+- **MeanShift:** A centroid-based algorithm that works by updating candidates for centroids to be the mean of the points within a given region. It does not require specifying the number of clusters.
 
-### 6. Advanced Distance Metrics
-Understanding that "distance" is subjective to the problem context:
-- **Euclidean ($L2$ Norm):** The straight-line physical distance. Best for low-dimensional, continuous numerical data. 
-- **Manhattan ($L1$ Norm):** The sum of absolute differences (grid-like movement). Often robust in higher dimensions compared to Euclidean.
-- **Cosine Distance:** Measures the cosine of the angle between two vectors.
-  - **Use Case:** Critical in text analysis (NLP) where the *direction* (context) matters more than the *magnitude* (frequency). 
-- **Jaccard Distance:** Measures dissimilarity between sets ($1 - \text{Intersection over Union}$).
-  - **Use Case:** Ideal for categorical data or comparing binary sets (e.g., "Does Set A have the same fruit as Set B?").
+### 6. Distance Metrics & The Curse of Dimensionality
+- **The Curse of Dimensionality:** As features increase, data becomes sparse, and the distance between the nearest and farthest points becomes negligible.
+- **Distance Metrics:**
+  - **Euclidean:** Standard straight-line distance.
+  - **Cosine:** Measures the angle (direction); crucial for text/NLP.
+  - **Jaccard:** Measures dissimilarity between sets ($1 - \text{Intersection over Union}$).
 
 ---
 
@@ -45,41 +45,43 @@ Understanding that "distance" is subjective to the problem context:
 
 ### Lab 1: K-Means Clustering & Image Quantization
 **Objective:** Master K-Means parameter tuning and apply clustering to image compression.
-
-#### A. Synthetic Data Analysis
-- **Sensitivity to Initialization:** We ran K-Means on synthetic blobs using different `random_state` values (10 vs 20) to observe how starting points affect the final cluster shapes.
-- **Finding the Elbow:** We calculated Inertia for $k=1$ to $10$ on a dataset generated via `make_blobs` to identify the optimal cluster count.
-
-#### B. Image Color Quantization
-- **Concept:** Treating an image not as a picture, but as a dataset of pixels (Rows = Total Pixels, Columns = R, G, B values).
-- **Process:**
-  1. Reshaped a 480x640 image into a flat table (307,200 rows x 3 columns).
-  2. Applied K-Means to find the "dominant colors" (clusters).
-  3. Replaced every pixel with its nearest cluster center color.
-- **Result:** Successfully compressed an image from millions of potential colors down to just $k$ colors (e.g., $k=8$) while retaining the image structure.
+- **Synthetic Data:** Analyzed sensitivity to initialization and used the Elbow Method to find optimal $k$.
+- **Image Quantization:** Compressed a 480x640 image by treating pixels as a dataset. Reduced millions of colors to just $k=8$ dominant colors by replacing pixels with their nearest cluster centroid.
 
 ### Lab 2: Investigating the Curse of Dimensionality
 **Objective:** Visualize and quantify how high-dimensional space impacts data density and model performance.
-
-#### A. Geometric Intuition (The N-Sphere)
-- **The Experiment:** We calculated the volume ratio of a hypersphere inside a hypercube as dimensions increased.
-- **The Finding:** As dimensions ($d$) rise, the volume of the sphere vanishes (e.g., from ~78% in 2D to ~0% in high dimensions). This proves that in high-dimensional space, **most data points live in the "corners"** (far from the center).
-
-#### B. Impact on Model Performance
-- **Simulation:** Trained a `DecisionTreeClassifier` on synthetic data while increasing the number of features (from 2 to 4000).
-- **Result:** Accuracy dropped significantly as dimensions increased. This demonstrated that adding features—without proper selection or reduction—can lead to noise and overfitting, confirming the need for techniques like **PCA** (Principal Component Analysis).
+- **Geometric Intuition:** Calculated the volume ratio of a hypersphere inside a hypercube. As dimensions ($d$) rose, the volume of the sphere vanished, proving that in high dimensions, **most data points live in the "corners"**.
+- **Model Impact:** Demonstrated that adding features without selection caused `DecisionTreeClassifier` accuracy to drop due to overfitting and sparsity.
 
 ### Lab 3: Distance Metrics Analysis
-**Objective:** Analyze how choosing the wrong distance metric can alter algorithm performance and cluster shapes.
+**Objective:** Analyze how choosing the wrong distance metric can alter algorithm performance.
+- **Comparison:** Implemented Euclidean, Manhattan, Cosine, and Jaccard distances.
+- **DBSCAN Sensitivity:** Visualized how changing the metric (e.g., to Cosine) completely changes the cluster shapes (cones vs. spheres).
 
-#### A. Mathematical Implementations
-- Implemented and compared **Euclidean**, **Manhattan**, **Cosine**, and **Jaccard** distances using `scipy.spatial` and `sklearn.metrics`.
-- **Key finding:** For categorical data (like the Breast Cancer dataset), we converted features using `OneHotEncoder` to apply **Jaccard Scoring**, proving that numerical distance (Euclidean) is invalid for non-numeric categories.
+### Lab 4: Advanced Clustering & Feature Engineering (Wine Quality)
+**Objective:** Compare K-Means vs. Agglomerative Clustering and use clustering results to improve Supervised Learning models.
+- **Data Exploration:** Analyzed wine chemical properties, applying Log Transforms to skewed features and scaling via `StandardScaler`.
+- **Method Comparison:** Compared K-Means and Agglomerative Clustering (Ward linkage) on the same dataset. Visualized the hierarchy using a **Dendrogram**.
+- **Clustering as a Feature:**
+  - Created a binary target variable (High Quality vs. Low Quality).
+  - **Experiment:** Trained a Random Forest Classifier *with* and *without* the K-Means cluster ID as a feature.
+  - **Result:** Including the cluster label as a feature improved the **ROC-AUC score**, proving that unsupervised learning can generate valuable inputs for supervised models.
 
-#### B. Impact on DBSCAN
-- We ran the **DBSCAN** algorithm on synthetic data using different `metric` parameters. 
-- **Euclidean/Manhattan:** Produced standard spherical or blocky clusters.
-- **Cosine:** Created cone-shaped clusters radiating from the origin, grouping points by *angle* rather than position. This demonstrated that algorithms behave fundamentally differently depending on the mathematical "ruler" used.
+### Lab 5: DBSCAN & Anomaly Detection
+**Objective:** Use DBSCAN to identify noise and handle non-linear data.
+- **Visual Proof:** Applied DBSCAN to a grid dataset where K-Means would fail. Successfully identified the "Core" points and separated "Noise."
+- **Handwriting Analysis:**
+  - **The Scenario:** Proving "bad handwriting" is statistically distinguishable.
+  - **Pipeline:** Combined clean MNIST digits with "messy" handwritten samples.
+  - **Dimensionality Reduction:** Used **t-SNE** to visualize the high-dimensional pixel data in 2D.
+  - **Result:** DBSCAN classified the messy handwriting as **Noise (-1 label)** or grouped it into incorrect clusters, quantitatively proving the writing was illegible.
+
+### Lab 6: Image Segmentation with MeanShift
+**Objective:** Apply MeanShift to segment images without pre-defining the number of colors.
+- **Process:**
+  - Converted image from BGR to RGB and applied `medianBlur` to smooth noise.
+  - Estimated **Bandwidth** (the window size) automatically using `sklearn.cluster.estimate_bandwidth`.
+  - **Outcome:** The algorithm automatically determined the number of distinct color regions (clusters) and segmented the image ("inna.jpeg") effectively.
 
 ---
 
@@ -91,25 +93,19 @@ After mastering the concepts in the course, I applied K-Means clustering to a re
 The goal was to transform raw customer data (demographics, purchase history, web activity) into actionable segments to help the marketing team move away from "one-size-fits-all" campaigns.
 
 ### 2. The Process & Technical Challenges
-* **Data Cleaning & Outlier Removal:**
-    * Identified skewed columns (e.g., `Income`, `WebVisits`).
-    * Removed extreme outliers ("Whales") that were distorting the cluster centers.
+* **Data Cleaning & Outlier Removal:** Identified skewed columns and removed extreme outliers ("Whales").
 * **Advanced Preprocessing Pipeline:**
-    * Built a Scikit-Learn `ColumnTransformer` to handle mixed data types.
-    * **Crucial Step:** Standard Scaling was not enough. I used **PowerTransformer (Yeo-Johnson)** to fix the skewness in continuous variables, which reduced Inertia from billions to manageable numbers.
-    * Used `OneHotEncoder` for categorical variables (Education, Marital Status).
+    * Built a Scikit-Learn `ColumnTransformer`.
+    * Used **PowerTransformer (Yeo-Johnson)** to fix skewness in continuous variables.
 * **Model Selection:**
-    * Used the **Elbow Method** to narrow down $k$ to 3 or 4.
-    * Used **Silhouette Scores** to validate. While $k=2$ had the highest score mathematically, I chose **$k=3$** because it provided better business granularity.
+    * Used the **Elbow Method** and **Silhouette Scores** to select **$k=3$**.
 
 ### 3. Key Insights (The Personas)
-Using the cluster centers, I derived three distinct customer profiles:
-
 | Cluster | Persona Name | Key Characteristics | Strategy |
 | :--- | :--- | :--- | :--- |
-| **0** | **The Budget Browsers** | Low Income, Parents with **Toddlers**. High web visits but low spending. | Cost control; Low-cost activation coupons. |
-| **1** | **The VIPs** | High Income, **No Kids/Empty Nesters**. Massive spending on Wine & Meat. | Focus on retention; Exclusive catalog offers. |
-| **2** | **The Deal Hunters** | Middle Income, Parents with **Teenagers**. High web & discount purchases. | Email retargeting; Bundle offers and sales. |
+| **0** | **The Budget Browsers** | Low Income, Parents with **Toddlers**. | Cost control; Low-cost activation coupons. |
+| **1** | **The VIPs** | High Income, **No Kids/Empty Nesters**. High Spend. | Exclusive catalog offers. |
+| **2** | **The Deal Hunters** | Middle Income, Parents with **Teenagers**. | Bundle offers and sales. |
 
 ---
 
@@ -128,9 +124,13 @@ This project uses **Python** and **VS Code**.
 3. **Select your Python Interpreter**:
    - Press `Ctrl + Shift + P` (Windows/Linux) or `Cmd + Shift + P` (Mac).
    - Type `Python: Select Interpreter`.
-   - Choose your global Python version or your specific virtual environment.
-
 4. **Install Dependencies**:
-   Open the VS Code terminal (`Ctrl + ` ` `) and run:
+   Open the VS Code terminal and run:
    ```bash
    pip install -r requirements.txt
+
+   ### Summary of Changes made:
+1.  **Added Section 5 (Advanced Clustering):** Defined Hierarchical, DBSCAN, and MeanShift concepts.
+2.  **Added Lab 4:** Summarized the Wine Quality lab, specifically focusing on the "Clustering as Feature Engineering" aspect (using Random Forest ROC-AUC).
+3.  **Added Lab 5:** Summarized the DBSCAN lab, highlighting the t-SNE usage and the "Handwriting as Noise" detection use case.
+4.  **Added Lab 6:** Included the MeanShift image segmentation work you provided in the code snippet.
